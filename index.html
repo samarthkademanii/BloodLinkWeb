@@ -759,6 +759,16 @@ let state = {
 }
 let connected = false
 
+// Anyone can POST a donor/hospital/request with arbitrary free text (the
+// API has no auth or sanitization), so anything from that data must be
+// escaped before going into innerHTML — otherwise a name like
+// "<img src=x onerror=...>" executes in every visitor's browser.
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]))
+}
+
 function timeAgo(iso) {
   const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
   if (mins < 1) return 'just now'
@@ -852,8 +862,8 @@ function renderRequests() {
     <div class="request-row">
       <div class="blood-badge"><span>${r.type}</span></div>
       <div class="request-info">
-        <div class="request-patient">${r.patient}</div>
-        <div class="request-detail">${r.hospital} · ${r.units} unit${r.units > 1 ? 's' : ''} · ${timeAgo(r.createdAt)}</div>
+        <div class="request-patient">${escapeHtml(r.patient)}</div>
+        <div class="request-detail">${escapeHtml(r.hospital)} · ${r.units} unit${r.units > 1 ? 's' : ''} · ${timeAgo(r.createdAt)}</div>
       </div>
       <span class="urgency-chip urgency-${r.urgency}">${r.urgency}</span>
     </div>`).join('')
@@ -865,10 +875,10 @@ function renderDonors() {
     const dotClass = d.available ? 'available' : (d.daysSinceDonation > 50 ? 'cooldown' : 'unavailable')
     const lastDon = d.daysSinceDonation === 0 ? 'Donated today' : `Last donated ${d.daysSinceDonation}d ago`
     return `<div class="donor-row">
-      <div class="donor-avatar">${initials}</div>
+      <div class="donor-avatar">${escapeHtml(initials)}</div>
       <div class="donor-info">
-        <div class="donor-name">${d.name}</div>
-        <div class="donor-meta">${d.city} · ${lastDon}</div>
+        <div class="donor-name">${escapeHtml(d.name)}</div>
+        <div class="donor-meta">${escapeHtml(d.city)} · ${lastDon}</div>
       </div>
       <div class="donor-type">${d.type}</div>
       <div class="status-dot ${dotClass}"></div>
@@ -880,10 +890,10 @@ function renderHospitals() {
   document.getElementById('hospital-grid').innerHTML = state.hospitals.map(h => {
     const chips = Object.entries(h.needs).map(([t, lvl]) => `<span class="type-chip ${lvl}">${t}</span>`).join('')
     return `<div class="hospital-card">
-      <div class="hospital-name">${h.name}</div>
-      <div class="hospital-address">${h.address}</div>
+      <div class="hospital-name">${escapeHtml(h.name)}</div>
+      <div class="hospital-address">${escapeHtml(h.address)}</div>
       <div class="hospital-types">${chips}</div>
-      <div class="hospital-contact"><span style="font-size:12px">📞</span><span class="hospital-phone">${h.phone}</span></div>
+      <div class="hospital-contact"><span style="font-size:12px">📞</span><span class="hospital-phone">${escapeHtml(h.phone)}</span></div>
     </div>`
   }).join('')
 }
@@ -919,8 +929,8 @@ function hospitalPopupHtml(h, coords) {
     distLine = `<div class="pop-dist">${km.toFixed(1)} km away</div>`
   }
   return `<div class="hospital-popup">
-    <b>${h.name}</b>
-    <div class="pop-addr">${h.address}<br>${h.phone}</div>
+    <b>${escapeHtml(h.name)}</b>
+    <div class="pop-addr">${escapeHtml(h.address)}<br>${escapeHtml(h.phone)}</div>
     <div>${chips}</div>
     ${distLine}
   </div>`
@@ -1022,9 +1032,9 @@ function renderAlerts() {
     <div class="alert-card ${a.level}">
       <div class="alert-icon ${a.level}">${a.icon}</div>
       <div class="alert-body">
-        <div class="alert-title">${a.title}</div>
-        <div class="alert-text">${a.text}</div>
-        <div class="alert-meta">${timeAgo(a.createdAt)}${a.hospital ? ` · ${a.hospital}` : ''}</div>
+        <div class="alert-title">${escapeHtml(a.title)}</div>
+        <div class="alert-text">${escapeHtml(a.text)}</div>
+        <div class="alert-meta">${timeAgo(a.createdAt)}${a.hospital ? ` · ${escapeHtml(a.hospital)}` : ''}</div>
         <div class="alert-actions">
           ${a.level === 'critical' ? `<button class="btn btn-danger btn-sm">Respond Now</button>` : ''}
           <button class="btn btn-outline btn-sm">Details</button>
@@ -1071,8 +1081,8 @@ function renderFind() {
         <div class="find-card-type" style="color:${col}">${r.type}</div>
         <div class="find-card-units"><span style="font-size:18px;font-weight:500;color:${col};font-variant-numeric:tabular-nums">${r.units}</span><br>units</div>
       </div>
-      <div class="find-card-hospital">${r.hospital}</div>
-      <div class="find-card-dist">${r.address}</div>
+      <div class="find-card-hospital">${escapeHtml(r.hospital)}</div>
+      <div class="find-card-dist">${escapeHtml(r.address)}</div>
       <button class="btn btn-outline btn-sm" style="margin-top:4px">Contact Blood Bank</button>
     </div>`
   }).join('')
