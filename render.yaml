@@ -2,4 +2,5 @@ services:
   - name: bloodlink-web
     type: web
     runtime: static
-    staticPublishPath: ./
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
