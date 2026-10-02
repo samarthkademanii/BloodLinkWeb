@@ -444,7 +444,7 @@ img { max-width: 100%; }
   </div>
 
   <div class="section-header">
-    <h2 class="section-title">Blood Inventory <span class="section-sub">All types · Bengaluru</span></h2>
+    <h2 class="section-title">Blood Inventory <span class="section-sub">All types · Pan-India network</span></h2>
     <span class="live-dot" id="live-dot-dashboard">Live</span>
   </div>
   <div class="inventory-grid" id="inventory-grid"></div>
@@ -467,7 +467,7 @@ img { max-width: 100%; }
   </div>
 
   <div class="section-header">
-    <h2 class="section-title">Hospital Locator <span class="section-sub">Bengaluru</span></h2>
+    <h2 class="section-title">Hospital Locator <span class="section-sub">Across India</span></h2>
     <div style="display:flex;align-items:center;gap:12px">
       <span style="font-size:11px;color:var(--fg-muted)">🏥 Hospital &nbsp; 📍 You</span>
       <button class="btn btn-outline btn-sm" id="locate-btn" onclick="locateMe()">Use my location</button>
@@ -656,16 +656,22 @@ img { max-width: 100%; }
 // Points the site at the BloodLink backend — the same API the mobile app uses.
 const API_BASE = 'https://bloodlink-backend-7ln9.onrender.com/api'
 
-// Approximate real coordinates for each hospital's Bengaluru locality.
+// Approximate real coordinates for each hospital's locality, across India.
 const HOSPITAL_COORDS = {
-  'Bengaluru City Hospital': [12.9759, 77.6080],           // MG Road
-  'Whitefield Multispeciality Hospital': [12.9698, 77.7500], // Whitefield
-  'Koramangala Emergency Care': [12.9352, 77.6245],        // Koramangala
-  "St. Mary's Hospital": [12.9250, 77.5938],               // Jayanagar
-  'HSR Layout Medical Centre': [12.9121, 77.6446],         // HSR Layout
-  'Electronic City Community Hospital': [12.8452, 77.6602], // Electronic City
+  'Bengaluru City Hospital': [12.9759, 77.6080],             // MG Road, Bengaluru
+  'Whitefield Multispeciality Hospital': [12.9698, 77.7500], // Whitefield, Bengaluru
+  'Koramangala Emergency Care': [12.9352, 77.6245],          // Koramangala, Bengaluru
+  "St. Mary's Hospital": [12.9250, 77.5938],                 // Jayanagar, Bengaluru
+  'HSR Layout Medical Centre': [12.9121, 77.6446],           // HSR Layout, Bengaluru
+  'Electronic City Community Hospital': [12.8452, 77.6602],  // Electronic City, Bengaluru
+  'Mumbai Central Hospital': [19.1197, 72.8468],             // Andheri, Mumbai
+  'Delhi NCR Medical Center': [28.6315, 77.2167],            // Connaught Place, Delhi
+  'Chennai General Hospital': [13.0418, 80.2341],            // T Nagar, Chennai
+  'Kolkata Emergency Care': [22.5535, 88.3522],              // Park Street, Kolkata
+  'Hyderabad Multispeciality Hospital': [17.4156, 78.4347],  // Banjara Hills, Hyderabad
+  'Pune Community Hospital': [18.5362, 73.8938],             // Koregaon Park, Pune
 }
-const BENGALURU_CENTER = [12.9716, 77.5946]
+const INDIA_CENTER = [22.9734, 78.6569]
 
 const bloodTypes = ['O−','O+','A−','A+','B−','B+','AB−','AB+']
 const compat = {
@@ -689,14 +695,18 @@ const fallback = {
     'AB−': { units: 14, max: 60 }, 'AB+': { units: 43, max: 120 },
   },
   donors: [
-    { name: 'Ananya Rao', type: 'O−', city: 'Indiranagar', daysSinceDonation: 0, available: true },
-    { name: 'Arjun Mehta', type: 'A+', city: 'Jayanagar', daysSinceDonation: 12, available: true },
-    { name: 'Priya Nair', type: 'B+', city: 'Koramangala', daysSinceDonation: 45, available: true },
-    { name: 'Rohan Kulkarni', type: 'AB+', city: 'Whitefield', daysSinceDonation: 55, available: false },
-    { name: 'Sneha Reddy', type: 'O+', city: 'HSR Layout', daysSinceDonation: 3, available: true },
-    { name: 'Vikram Shetty', type: 'B−', city: 'Electronic City', daysSinceDonation: 8, available: true },
-    { name: 'Fatima Sheikh', type: 'A−', city: 'Shivajinagar', daysSinceDonation: 30, available: false },
-    { name: 'Karthik Iyer', type: 'O−', city: 'Malleshwaram', daysSinceDonation: 0, available: true },
+    { name: 'Ananya Rao', type: 'O−', city: 'Indiranagar, Bengaluru', daysSinceDonation: 0, available: true },
+    { name: 'Arjun Mehta', type: 'A+', city: 'Jayanagar, Bengaluru', daysSinceDonation: 12, available: true },
+    { name: 'Priya Nair', type: 'B+', city: 'Koramangala, Bengaluru', daysSinceDonation: 45, available: true },
+    { name: 'Rohan Kulkarni', type: 'AB+', city: 'Whitefield, Bengaluru', daysSinceDonation: 55, available: false },
+    { name: 'Sneha Reddy', type: 'O+', city: 'HSR Layout, Bengaluru', daysSinceDonation: 3, available: true },
+    { name: 'Vikram Shetty', type: 'B−', city: 'Electronic City, Bengaluru', daysSinceDonation: 8, available: true },
+    { name: 'Fatima Sheikh', type: 'A−', city: 'Andheri, Mumbai', daysSinceDonation: 30, available: false },
+    { name: 'Karthik Iyer', type: 'O−', city: 'Connaught Place, Delhi', daysSinceDonation: 0, available: true },
+    { name: 'Divya Krishnan', type: 'AB−', city: 'T Nagar, Chennai', daysSinceDonation: 5, available: true },
+    { name: 'Sourav Banerjee', type: 'B−', city: 'Park Street, Kolkata', daysSinceDonation: 40, available: false },
+    { name: 'Lakshmi Prasad', type: 'A+', city: 'Banjara Hills, Hyderabad', daysSinceDonation: 15, available: true },
+    { name: 'Omkar Deshmukh', type: 'O+', city: 'Koregaon Park, Pune', daysSinceDonation: 2, available: true },
   ],
   requests: [
     { patient: 'Patient #8841', type: 'O−', hospital: 'Bengaluru City', urgency: 'critical', units: 2, createdAt: new Date(Date.now() - 8 * 60000).toISOString() },
@@ -704,6 +714,9 @@ const fallback = {
     { patient: 'Patient #7719', type: 'B−', hospital: 'Koramangala ER', urgency: 'high', units: 1, createdAt: new Date(Date.now() - 60 * 60000).toISOString() },
     { patient: 'Patient #8003', type: 'A+', hospital: "St. Mary's", urgency: 'standard', units: 3, createdAt: new Date(Date.now() - 2 * 3600000).toISOString() },
     { patient: 'Patient #9910', type: 'O+', hospital: 'HSR Layout Medical', urgency: 'standard', units: 2, createdAt: new Date(Date.now() - 3 * 3600000).toISOString() },
+    { patient: 'Patient #6652', type: 'AB−', hospital: 'Mumbai Central', urgency: 'critical', units: 2, createdAt: new Date(Date.now() - 15 * 60000).toISOString() },
+    { patient: 'Patient #5521', type: 'O+', hospital: 'Delhi NCR Medical', urgency: 'critical', units: 3, createdAt: new Date(Date.now() - 35 * 60000).toISOString() },
+    { patient: 'Patient #4410', type: 'A+', hospital: 'Chennai General', urgency: 'high', units: 2, createdAt: new Date(Date.now() - 90 * 60000).toISOString() },
   ],
   hospitals: [
     { name: 'Bengaluru City Hospital', address: '45 MG Road, Bengaluru', phone: '+91 80 4012 3400', needs: { 'O−': 'critical', 'B−': 'critical', 'AB+': 'low', 'A+': 'ok', 'O+': 'ok' } },
@@ -712,11 +725,19 @@ const fallback = {
     { name: "St. Mary's Hospital", address: '45 Sarjapur Road, Jayanagar, Bengaluru', phone: '+91 80 4045 3300', needs: { 'O+': 'ok', 'A+': 'ok', 'B+': 'low', 'AB+': 'ok' } },
     { name: 'HSR Layout Medical Centre', address: '9 27th Main Road, HSR Layout, Bengaluru', phone: '+91 80 4056 9900', needs: { 'O−': 'critical', 'O+': 'low', 'A−': 'ok', 'AB−': 'ok' } },
     { name: 'Electronic City Community Hospital', address: '300 Hosa Road, Electronic City, Bengaluru', phone: '+91 80 4067 4455', needs: { 'A+': 'ok', 'B+': 'ok', 'O+': 'ok', 'AB+': 'low' } },
+    { name: 'Mumbai Central Hospital', address: '14 Linking Road, Andheri, Mumbai', phone: '+91 22 4078 2200', needs: { 'O−': 'low', 'B+': 'ok', 'A+': 'ok', 'AB−': 'critical' } },
+    { name: 'Delhi NCR Medical Center', address: '7 Barakhamba Road, Connaught Place, New Delhi', phone: '+91 11 4089 3300', needs: { 'O+': 'critical', 'A−': 'low', 'B−': 'ok', 'AB+': 'ok' } },
+    { name: 'Chennai General Hospital', address: '22 Usman Road, T Nagar, Chennai', phone: '+91 44 4090 1100', needs: { 'B+': 'low', 'O−': 'ok', 'A+': 'critical', 'AB−': 'ok' } },
+    { name: 'Kolkata Emergency Care', address: '5 Park Street, Kolkata', phone: '+91 33 4001 4400', needs: { 'A−': 'critical', 'O+': 'ok', 'B−': 'low', 'AB+': 'ok' } },
+    { name: 'Hyderabad Multispeciality Hospital', address: '18 Road No. 12, Banjara Hills, Hyderabad', phone: '+91 40 4056 7700', needs: { 'AB−': 'low', 'O−': 'ok', 'A+': 'ok', 'B+': 'critical' } },
+    { name: 'Pune Community Hospital', address: '9 North Main Road, Koregaon Park, Pune', phone: '+91 20 4023 5500', needs: { 'O+': 'low', 'A−': 'ok', 'B+': 'ok', 'AB+': 'critical' } },
   ],
   alerts: [
     { level: 'critical', icon: '🚨', title: 'Critical shortage: O− at Bengaluru City Hospital', text: 'Only 2 units remain. O− is needed for emergency trauma patients. O− donors within 10 km have been notified.', hospital: 'Bengaluru City Hospital', createdAt: new Date(Date.now() - 8 * 60000).toISOString() },
     { level: 'critical', icon: '🚨', title: 'Urgent: AB+ needed at Whitefield Multispeciality', text: 'Scheduled surgeries require 4 units of AB+ within 6 hours. Current stock critically low.', hospital: 'Whitefield Multispeciality Hospital', createdAt: new Date(Date.now() - 22 * 60000).toISOString() },
     { level: 'warning', icon: '⚠️', title: 'Low B− supply — Koramangala Emergency Care', text: 'B− stock has dropped to 7 units city-wide. Routine surgeries may be affected if supplies are not replenished within 48 hours.', hospital: 'Koramangala Emergency Care', createdAt: new Date(Date.now() - 3600000).toISOString() },
+    { level: 'critical', icon: '🚨', title: 'Critical shortage: AB− at Mumbai Central Hospital', text: 'AB− is the rarest type in the network. Only a handful of units remain — AB− donors in Mumbai have been notified.', hospital: 'Mumbai Central Hospital', createdAt: new Date(Date.now() - 15 * 60000).toISOString() },
+    { level: 'critical', icon: '🚨', title: 'Urgent: O+ needed at Delhi NCR Medical Center', text: 'Emergency surgeries today require O+ units. Current stock critically low at this location.', hospital: 'Delhi NCR Medical Center', createdAt: new Date(Date.now() - 35 * 60000).toISOString() },
     { level: 'warning', icon: '📢', title: 'Blood drive this Saturday', text: 'Cubbon Park is hosting a blood drive on Saturday Oct 4. 12 donor slots still available.', hospital: null, createdAt: new Date(Date.now() - 3 * 3600000).toISOString() },
     { level: 'info', icon: '🩸', title: 'A− inventory stabilized', text: "Following last week's alert, A− supplies have recovered to adequate levels thanks to 14 new donors.", hospital: null, createdAt: new Date(Date.now() - 5 * 3600000).toISOString() },
   ],
@@ -874,8 +895,8 @@ let userMarker = null
 function hospitalCoords(h) {
   if (HOSPITAL_COORDS[h.name]) return HOSPITAL_COORDS[h.name]
   // Unknown hospital (e.g. one someone registered through the form) — place it
-  // near the city center with a small random offset so it doesn't overlap.
-  return [BENGALURU_CENTER[0] + (Math.random() - 0.5) * 0.08, BENGALURU_CENTER[1] + (Math.random() - 0.5) * 0.08]
+  // near the geographic center of India with a random offset so it doesn't overlap.
+  return [INDIA_CENTER[0] + (Math.random() - 0.5) * 4, INDIA_CENTER[1] + (Math.random() - 0.5) * 4]
 }
 
 function distanceKm([lat1, lng1], [lat2, lng2]) {
@@ -905,10 +926,16 @@ function hospitalPopupHtml(h, coords) {
   </div>`
 }
 
+function fitToHospitals() {
+  if (!hospitalMap || !hospitalMarkers.length) return
+  hospitalMap.invalidateSize()
+  hospitalMap.fitBounds(L.featureGroup(hospitalMarkers).getBounds().pad(0.2))
+}
+
 function renderMap() {
   if (!window.L) return // Leaflet failed to load (e.g. offline) — skip gracefully
   if (!hospitalMap) {
-    hospitalMap = L.map('hospital-map').setView(BENGALURU_CENTER, 12)
+    hospitalMap = L.map('hospital-map').setView(INDIA_CENTER, 5)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 18,
@@ -922,7 +949,13 @@ function renderMap() {
     marker.on('popupopen', () => marker.setPopupContent(hospitalPopupHtml(h, coords)))
     return marker
   })
+  fitToHospitals()
 }
+
+// Safety net: some browsers report a wrong container size the instant the
+// map is created, which throws off the initial fitBounds. Re-fit once more
+// after everything has fully loaded and settled.
+window.addEventListener('load', () => setTimeout(fitToHospitals, 300))
 
 function locateMe() {
   const statusEl = document.getElementById('locate-status')
