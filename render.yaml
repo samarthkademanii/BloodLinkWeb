@@ -1,0 +1,5 @@
+services:
+  - name: bloodlink-web
+    type: web
+    runtime: static
+    staticPublishPath: ./
