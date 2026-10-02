@@ -935,9 +935,14 @@ function fitToHospitals() {
 function renderMap() {
   if (!window.L) return // Leaflet failed to load (e.g. offline) — skip gracefully
   if (!hospitalMap) {
-    hospitalMap = L.map('hospital-map').setView(INDIA_CENTER, 5)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
+    // Locked to India — this app has no hospitals anywhere else, and
+    // Esri's World Street Map is an English-language basemap by design,
+    // unlike OpenStreetMap's default tiles, which render each place's
+    // local-script name whenever it has no separate English tag.
+    const INDIA_BOUNDS = L.latLngBounds([6, 68], [38, 98])
+    hospitalMap = L.map('hospital-map', { maxBounds: INDIA_BOUNDS, maxBoundsViscosity: 1.0, minZoom: 4, fadeAnimation: false }).setView(INDIA_CENTER, 5)
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri',
       maxZoom: 18,
     }).addTo(hospitalMap)
   }
